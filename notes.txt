@@ -1,0 +1,94 @@
+posts.models.py
+        from django.db import models
+
+
+        class Post(models.Model): #inheritance or polymorphism  (inheriting the Model class)
+            title = models.Charfield(max_length=128) #composition (handles db side and text fields)
+            subtitle = models.Charfield(max_length=128)
+            body = models.TextField()
+            created_on = models.DateTimeField(auto_now_add=True)
+
+            def __str__(self):   
+                return self.title
+                                    #by redefining the rules here we will now see the title of each post instead of the generic Post (1), Post (2) etc on the DJANGO admin save.
+
+
+        To see what we just did:
+
+            1) create a migration 
+                on the terminal enter:
+                    python3 manage.py makemigrations
+            2) run the migration
+                    python3 manage.py migrate 
+
+
+
+            
+
+    0001__initial.py will start counting up with each iteration (version control)
+        migrations files are auto generated
+                initial will always = True
+            after that only 
+                dependencies and operations
+
+posts.admin.py we added:
+
+        from .models import Post
+
+        admin.site.register(Post)
+
+create new superuser in terminal:
+        python3 manage.py createsuperuser
+
+then run the development server:
+        python3 manage.py runserver
+
+
+
+posts.views.py 
+
+    DELETE everything
+
+        from django.views.generic import ListView 
+        from .models import Post
+
+        class PostListView(ListView):
+                template_name = "list.html"
+                model = Post
+
+            ***purpose driven views return a context driven object:
+            to acccess this data we use the dot operator.
+            default naming scheme.  Post_List
+
+
+
+create list.html in templates
+
+        {% extends 'base.html' %}
+
+
+        {% block title %}Posts{% endblock title %}
+
+        {% block content %}
+        <h1>Posts</h1>
+        <ul>
+            {% for post in post_list %}  #for is a control flow statement.  It must have 
+                                            an  ending statement
+            <li>
+                {{ post.title }}
+            </li>
+            {% endfor %}
+        </ul>
+        {% endblock content %}
+
+
+
+in posts folder create urls.py
+            posts.urls.py:
+                    from django.urls import path
+            from .views import PostListView
+
+            urlpatterns = [
+                path("", PostListView.as_view(), name="list"),
+]
+
