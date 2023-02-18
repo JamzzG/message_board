@@ -53,7 +53,7 @@ posts.views.py
         from .models import Post
 
         class PostListView(ListView):
-                template_name = "list.html"
+                template_name = "list.html
                 model = Post
 
             ***purpose driven views return a context driven object:
@@ -77,7 +77,7 @@ create list.html in templates
             <li>
                 {{ post.title }}
             </li>
-            {% endfor %}
+            {% endfor %}  #only way to tell JINJA to stop looping through FOR statement.
         </ul>
         {% endblock content %}
 
@@ -92,3 +92,89 @@ in posts folder create urls.py
                 path("", PostListView.as_view(), name="list"),
 ]
 
+
+
+
+
+
+in posts.views.py added
+    from django.views.generic.edit import CreateView
+
+and added the class:
+    class PostCreateView(CreateView):
+            template_name = "new.html"
+            model = Post
+            fields = ["title", "subtitle", "body"]   
+                            # (These fields were defined in models.py first)
+
+
+templates.new.html:
+
+        % extends 'base.html' %
+
+
+        {% block title %}New Post{% endblock title %}
+
+
+        {% block content %} 
+        <h1>New Post</h1>
+        <form method="POST">
+            {% csrf_token %}  
+            {{ form.as_p }}    #renders the form as a p paragraph
+            <input type= "submit" value="Create" class="btn btn-success">
+        </form>
+        {% endblock content %}
+
+            Cross Site Request Forgery attacks (csrf_token protects against)
+            renders a hidden token to validate the integrity of the request.
+            
+            form.as_p                more as_div, as_p as_table as_ul
+
+posts.urs.py
+    added 
+        PostCreateView to be imported from .views
+
+    and 
+       path{"new/", PostCreateView.as_view(), name="new"},
+
+posts.views.py
+    added:
+        DetailView
+    and defined
+        PostDetailView class with a template and model.
+            USING IDS
+
+
+Homework
+       web developer tools and SASS course UDEMY.
+
+
+post.urls.py
+    added import from .views
+        PostDetailViews
+            added () to break it into multiple lines.
+
+    added to urlpatterns:
+        path("<int:pk>/", PostDetailView.as_view(), name="detail")
+            reads a urls parameter (PK=Primary Key) converts it into an integer.
+                selectall from post where id = PK
+
+
+templates.list.html:
+
+changed <li> lines to:
+   
+            <li><a href="{% url 'detail' post.id %}">
+                {{ post.title }}
+            </a>
+                
+            </li>
+
+
+            in posts.models.py
+                changed:
+                    return reverse("list")
+                    to:
+                         def get_absolute_url(self):
+        return reverse("detail", arg=[self.id]) 
+  
